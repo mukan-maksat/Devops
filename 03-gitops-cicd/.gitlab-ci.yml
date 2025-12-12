@@ -1,0 +1,59 @@
+image: alpine:latest
+
+stages:
+  - validate
+  - review
+  - deploy
+  - notify
+
+variables:
+  MC_HOST_myminio: "http://minio.example.com:9000"  # заменишь в CI Variables
+
+before_script:
+  - apk add --no-cache curl jq yq bash vault mc
+  - export VAULT_ADDR=https://vault.example.com  # тоже в CI Variables
+  - vault login -method=gitlab-jwt jwt_role=minio-deploy
+  - mc alias set myminio $MC_HOST_myminio $MINIO_ACCESS_KEY $MINIO_SECRET_KEY
+
+validate:
+  stage: validate
+  script:
+    - yq eval buckets.yaml >/dev/null
+    - yq eval users.yaml >/dev/null
+    - echo "YAML валиден"
+  only:
+    - merge_requests
+    - main
+
+review:
+  stage: review
+  script:
+    - ./scripts/preview.sh
+  artifacts:
+    paths: [preview.txt]
+    when: always
+  when: manual
+  only:
+    - merge_requests
+
+deploy:
+  stage: deploy
+  script:
+    - if ! diff <(sha256sum buckets.yaml users.yaml) .last-applied-hash >/dev/null 2>&1; then
+        echo "Обнаружены изменения — применяем";
+        ./scripts/apply.sh;
+      else
+        echo "Изменений нет — пропускаем";
+        exit 0;
+      fi
+  environment: deploy
+  when: manual
+  only:
+    - main
+
+notify:
+  stage: notify
+  script:
+    - curl -X POST -H 'Content-type: application/json' --data "{\"text\":\"MinIO конфигурация обновлена в проде\nКоммит: $CI_COMMIT_SHORT_SHA\"}" $SLACK_WEBHOOK_URL
+  only:
+    - main

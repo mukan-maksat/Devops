@@ -1,0 +1,7 @@
+users:
+  - access_key: backup-user
+    secret_key: "((vault.backup-user.password))"
+    policy: readwrite
+  - access_key: readonly-app
+    secret_key: "((vault.readonly-app.password))"
+    policy: readonly

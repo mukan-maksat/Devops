@@ -1,0 +1,11 @@
+buckets:
+  - name: backups
+    policy: none
+    versioning: true
+    locking: false
+  - name: logs
+    policy: none
+    versioning: false
+    locking: true
+  - name: public-site
+    policy: public

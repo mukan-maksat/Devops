@@ -1,0 +1,14 @@
+●  127.0.0.1:9001
+   Uptime: 1 hour 
+   Version: 2025-09-07T16:13:09Z
+   Network: 1/1 OK 
+   Drives: 3/3 OK 
+   Pool: 1
+
+┌──────┬───────────────────────┬─────────────────────┬──────────────┐
+│ Pool │ Drives Usage          │ Erasure stripe size │ Erasure sets │
+│ 1st  │ 0.2% (total: 1.9 TiB) │ 3                   │ 1            │
+└──────┴───────────────────────┴─────────────────────┴──────────────┘
+
+76 B Used, 1 Bucket, 2 Objects
+3 drives online, 0 drives offline, EC:1
